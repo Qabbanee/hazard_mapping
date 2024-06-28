@@ -138,6 +138,55 @@ matern <- inla.spde2.pcmatern(
   prior.sigma = c(0.1, 0.01),
   prior.range = c(10, 0.1)
 )
+f.elev <- function(where) {
+  # Extract the values
+  v <- eval_spatial(elevData, where, layer = "elev")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(elevData, where, v)
+  }
+  return(v)
+}
+
+f.slope.Factor <- function(where) {
+  # Extract the values
+  v <- eval_spatial(slopeData.Factor, where, layer = "slope")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(slopeData.Factor, where, v)
+  }
+  return(v)
+}
+
+f.aspect.Factor <- function(where) {
+  # Extract the aspect categories
+  v <- eval_spatial(aspectData.Factor, where, layer = "aspect")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(aspectData.Factor, where, v)
+  }
+  return(v)
+}
+
+f.slope <- function(where) {
+  # Extract the values
+  v <- eval_spatial(slopeData, where, layer = "slope")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(slopeData, where, v)
+  }
+  return(v)
+}
+
+f.aspect <- function(where) {
+  # Extract the aspect categories
+  v <- eval_spatial(aspectData, where, layer = "aspect")
+  # Fill in missing values
+  if (any(is.na(v))) {
+    v <- bru_fill_missing(aspectData, where, v)
+  }
+  return(v)
+}
 
 # Define and fit multiple models
 cmp1S <- coordinates ~ Intercept(1) +
@@ -219,12 +268,12 @@ knitr::kable(deltaIC(fit1S, fit2S, fit3S, fit4S, fit5S, fit6S, fit1, fit2, fit3,
 
 # Generate predictions for the models with mySmooth spatial effect
 pred.df <- fm_pixels(mesh, mask = boundary, format = "sp")
-fit.int1 <- predict(fit1, pred.df, ~ exp(mySmooth + elev + Intercept + aspect + slope))
-fit.int2 <- predict(fit2, pred.df, ~ exp(mySmooth + elev + Intercept + aspect + slope))
-fit.int3 <- predict(fit3, pred.df, ~ exp(mySmooth + elev + Intercept + slope))
-fit.int4 <- predict(fit4, pred.df, ~ exp(mySmooth + elev + Intercept + slope))
-fit.int5 <- predict(fit5, pred.df, ~ exp(mySmooth + elev + Intercept + aspect + slope))
-fit.int6 <- predict(fit6, pred.df, ~ exp(mySmooth + elev + Intercept + aspect + slope))
+fit.int1 <- predict(fit1, pred.df, ~ exp(elev + Intercept + aspect + slope))
+fit.int2 <- predict(fit2, pred.df, ~ exp(elev + Intercept + aspect + slope))
+fit.int3 <- predict(fit3, pred.df, ~ exp( elev + Intercept + slope))
+fit.int4 <- predict(fit4, pred.df, ~ exp( elev + Intercept + slope))
+fit.int5 <- predict(fit5, pred.df, ~ exp(elev + Intercept + aspect + slope))
+fit.int6 <- predict(fit6, pred.df, ~ exp( elev + Intercept + aspect + slope))
 
 # Plot the predictions
 ggplot() +
